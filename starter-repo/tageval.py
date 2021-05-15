@@ -97,6 +97,7 @@ def evaluate_taggings(goldseq_predseq_pairs, ignore_labels=False):
     num_predspans = 0
 
     tp, fp, fn = 0,0,0
+    count = 1
 
     for goldseq,predseq in goldseq_predseq_pairs:
         N = len(goldseq)
@@ -116,7 +117,13 @@ def evaluate_taggings(goldseq_predseq_pairs, ignore_labels=False):
 
         goldspans_set = set(goldspans)
         predspans_set = set(predspans)
+        
+        if goldseq != predseq and count < 50:
+            print(goldseq)
+            print(predseq)
+            print(count)
 
+        count += 1
         tp += len(goldspans_set & predspans_set)
         fp += len(predspans_set - goldspans_set)
         fn += len(goldspans_set - predspans_set)
@@ -131,7 +138,7 @@ def evaluate_taggings(goldseq_predseq_pairs, ignore_labels=False):
 def read_tokens_tags_file(filename):
     """Returns list of sentences.  each sentence is a pair (tokens, tags), each
     of which is a list of strings of the same length."""
-    sentences = open(filename).read().strip().split("\n\n")
+    sentences = open(filename, encoding='utf8').read().strip().split("\n\n")
     ret = []
     for sent in sentences:
         sent = sent.strip()
@@ -145,11 +152,18 @@ def read_tokens_tags_file(filename):
     return ret
 
 def read_tags_file(filename):
-    sentences = open(filename).read().strip().split("\n\n")
+    sentences = open(filename).read().strip()
+    x = sentences.split("\n\n")
+    #print("x len", len(x))
+    # for char in sentences:
+    #     print (ord(char))
     ret = []
-    for sent in sentences:
+    for sent in x:
         sent = sent.strip()
         lines = sent.split("\n")
+        # print(sent)
+        # print("LINES", lines)
+        #count = 1
         for line in lines:
             assert len(line.split())==1, "Was expecting 1 item per line"
         ret.append( [line.strip() for line in lines] )
